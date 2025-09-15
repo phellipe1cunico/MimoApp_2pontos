@@ -3,4 +3,5 @@
     <string name="title_activity_tela_principal">TelaPrincipal</string>
     <string name="title_activity_anotacoes">Anotacoes</string>
     <string name="title_activity_rodape">Rodape</string>
+    <string name="title_activity_leaderboard">Leaderboard</string>
 </resources>

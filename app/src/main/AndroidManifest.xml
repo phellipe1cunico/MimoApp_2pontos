@@ -12,6 +12,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MimoApp">
         <activity
+            android:name=".Leaderboard"
+            android:exported="false"
+            android:label="@string/title_activity_leaderboard"
+            android:theme="@style/Theme.MimoApp" />
+        <activity
             android:name=".Rodape"
             android:exported="false"
             android:label="@string/title_activity_rodape"

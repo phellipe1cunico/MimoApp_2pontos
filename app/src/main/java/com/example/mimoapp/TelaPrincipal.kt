@@ -51,7 +51,6 @@ class TelaPrincipal : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
 
-
         }
     }
 }
@@ -214,8 +213,6 @@ fun Linguagem() {
 
 
                     )
-
-
             }
         }
     }
@@ -280,13 +277,8 @@ fun Exercicios(){
                 )
 
             }
-
-
         }
-
-
     }
-
 }
 
 

@@ -12,18 +12,26 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,7 +44,9 @@ class Anotacoes : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-
+            MimoAppTheme {
+                TelaAnotacoes()
+            }
         }
     }
 }
@@ -46,33 +56,81 @@ class Anotacoes : ComponentActivity() {
 fun TelaAnotacoes() {
     Scaffold { innerPadding ->
 
-        var anotacoes = remember {
-            mutableListOf("")
+            var anotacoes = remember {
+                mutableListOf("")
 
-        }
+            }
 
-        Surface(
-            color = Color(255, 250, 250),
-            modifier = Modifier.fillMaxSize().padding(innerPadding)
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
+            Surface(
+                color = Color(255, 250, 250),
+                modifier = Modifier.fillMaxSize().padding(innerPadding)
             ) {
-                Surface(
-                    color = Color(15, 82, 186)
-                )
-                {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.padding(15.dp)
-                    ) {
-                        Cabecalho1()
-                        Spacer(modifier = Modifier.height(10.dp))
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Surface(
+                        color = Color(15, 82, 186)
+                    ){
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.padding(15.dp)
+                        ) {
+                            Cabecalho1()
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                        }
                     }
 
+                    FormNotas()
+                    Spacer(modifier = Modifier.weight(1f))
+                    Rodape()
                 }
             }
         }
     }
+
+
+@Composable
+fun FormNotas(){
+
+    var notaInput by remember {
+        mutableStateOf("")
+    }
+
+    Row(
+        modifier = Modifier.padding(vertical = 20.dp)
+    ) {
+        TextField(
+            value = notaInput,
+            onValueChange = { notaInput = it},
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color(15, 82, 186),
+                unfocusedContainerColor = Color(24, 104, 238, 255),
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White
+            )
+        )
+
+        Spacer(modifier = Modifier.width(10.dp))
+
+        Button(
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color (15,82,186),
+                contentColor = Color.White
+            ),
+            onClick = {
+
+            }
+
+        ){
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = "Icone Add",
+            )
+
+        }
+    }
 }
+
+
 
