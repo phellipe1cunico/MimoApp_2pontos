@@ -12,6 +12,16 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MimoApp">
         <activity
+            android:name=".Rodape"
+            android:exported="false"
+            android:label="@string/title_activity_rodape"
+            android:theme="@style/Theme.MimoApp" />
+        <activity
+            android:name=".Anotacoes"
+            android:exported="false"
+            android:label="@string/title_activity_anotacoes"
+            android:theme="@style/Theme.MimoApp" />
+        <activity
             android:name=".TelaPrincipal"
             android:exported="true"
             android:label="@string/title_activity_tela_principal"

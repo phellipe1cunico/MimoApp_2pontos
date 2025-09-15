@@ -248,9 +248,7 @@ fun Titulo(){
 @Composable
 fun Exercicios(){
     Card (
-        colors = CardDefaults.cardColors(
-            containerColor = Color(15,82,186)
-        )
+        colors = CardDefaults.cardColors(containerColor = Color(15,82,186))
     ){
         Row(
             modifier = Modifier.padding(horizontal = 20.dp).height(100.dp),
@@ -305,13 +303,12 @@ fun Rodape(){
             horizontalArrangement = Arrangement.Center
         ) {
             BotaoChapeu()
-            Spacer(modifier = Modifier.weight(4f))
+            Spacer(modifier = Modifier.weight(1f))
             BotaoNotas()
-            Spacer(modifier = Modifier.weight(4f))
+            Spacer(modifier = Modifier.weight(1f))
             BotaoMedalha()
-            Spacer(modifier = Modifier.weight(4f))
+            Spacer(modifier = Modifier.weight(1f))
             BotaoPerfil()
-
         }
 
     }
@@ -320,22 +317,25 @@ fun Rodape(){
 //@Preview
 @Composable
 fun BotaoChapeu(){
-    Button(
-        onClick = {
 
-        },
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color(15,82,186),
-            contentColor = Color.White
-        )
-    ) {
-        Icon(
-            painter = painterResource(id = R.drawable.graduate),
-            contentDescription = "Chapéu",
-            modifier = Modifier.size(40.dp)
-        )
+        Button(
+            onClick = {
 
-    }
+            },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(15,82,186),
+                contentColor = Color.White
+            )
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.graduate),
+                contentDescription = "Chapéu",
+                modifier = Modifier.size(40.dp)
+            )
+
+        }
+
+
 }
 
 //@Preview
