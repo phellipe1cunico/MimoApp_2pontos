@@ -50,7 +50,9 @@ class TelaPrincipal : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-
+            MimoAppTheme {
+                TelaInicial()
+            }
         }
     }
 }
@@ -319,6 +321,7 @@ fun BotaoChapeu(){
                 contentColor = Color.White
             )
         ) {
+
             Icon(
                 painter = painterResource(id = R.drawable.graduate),
                 contentDescription = "Chapéu",
