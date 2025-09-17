@@ -4,4 +4,6 @@
     <string name="title_activity_anotacoes">Anotacoes</string>
     <string name="title_activity_rodape">Rodape</string>
     <string name="title_activity_leaderboard">Leaderboard</string>
+    <string name="title_activity_perfil">Perfil</string>
+    <string name="title_activity_exercicio">Exercicio</string>
 </resources>

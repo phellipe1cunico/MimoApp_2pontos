@@ -12,6 +12,16 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MimoApp">
         <activity
+            android:name=".Perfil"
+            android:exported="false"
+            android:label="@string/title_activity_perfil"
+            android:theme="@style/Theme.MimoApp" />
+        <activity
+            android:name=".Exercicio"
+            android:exported="false"
+            android:label="@string/title_activity_exercicio"
+            android:theme="@style/Theme.MimoApp" />
+        <activity
             android:name=".Leaderboard"
             android:exported="false"
             android:label="@string/title_activity_leaderboard"

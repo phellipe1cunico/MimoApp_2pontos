@@ -1,6 +1,7 @@
 package com.example.mimoapp
 
 
+import android.content.Intent
 import android.os.Bundle
 import android.provider.CalendarContract
 import androidx.activity.ComponentActivity
@@ -246,11 +247,15 @@ fun Titulo(){
 //@Preview
 @Composable
 fun Exercicios(){
-    Card (
+    val context = LocalContext.current  // ✅ pegar o contexto aqui, dentro da @Composable
+
+    Card(
         colors = CardDefaults.cardColors(containerColor = Color(15,82,186))
     ){
         Row(
-            modifier = Modifier.padding(horizontal = 20.dp).height(100.dp),
+            modifier = Modifier
+                .padding(horizontal = 20.dp)
+                .height(100.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
         ){
@@ -264,7 +269,9 @@ fun Exercicios(){
             Spacer(modifier = Modifier.width(30.dp))
 
             Button(
-                onClick = { },
+                onClick = {
+                    context.startActivity(Intent(context, Exercicio::class.java)) // ✅ usar o context já obtido
+                },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(15,82,186),
                     contentColor = Color.White,
@@ -282,6 +289,7 @@ fun Exercicios(){
         }
     }
 }
+
 
 
 //Preview
@@ -356,10 +364,11 @@ fun BotaoMedalha(){
 
 //@Preview
 @Composable
-fun BotaoPerfil(){
+fun BotaoPerfil() {
+    val context = LocalContext.current
     Button(
         onClick = {
-
+            context.startActivity(Intent(context, PerfilActivity::class.java))
         },
         colors = ButtonDefaults.buttonColors(
             containerColor = Color(15,82,186),
@@ -371,9 +380,9 @@ fun BotaoPerfil(){
             contentDescription = "Perfil",
             modifier = Modifier.size(40.dp)
         )
-
     }
 }
+
 
 //@Preview
 @Composable
