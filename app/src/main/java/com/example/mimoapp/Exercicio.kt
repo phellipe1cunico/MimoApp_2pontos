@@ -63,67 +63,55 @@ class Exercicio : ComponentActivity() {
 @Composable
 fun TelaExercicio(navController: NavController) {
 
-    val opcoes by remember {mutableStateOf(listOf("func", "fun", "function", "def")) }
+    val opcoes by remember { mutableStateOf(listOf("func", "fun", "function", "def")) }
+    val respostaCorreta = "fun"
 
-    var resp by remember { mutableStateOf("")}
+    // Novo estado para controlar qual resposta foi selecionada. null = nenhuma.
+    var respostaSelecionada by remember { mutableStateOf<String?>(null) }
+    val isAnswered = respostaSelecionada != null
 
     Scaffold { innerPadding ->
         Surface(
             color = Color(255, 250, 250),
-            modifier = Modifier.fillMaxSize().padding(innerPadding)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
+                // --- Topo da tela (Barra azul com Vidas) - Sem alterações ---
                 Surface(
                     color = Color(24, 104, 238, 255),
-                    modifier = Modifier.fillMaxWidth().height(48.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
                 ) {
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Button(
-                                onClick = {
-                                    navController.popBackStack()
-                                },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(24, 104, 238, 255),
-                                    contentColor = Color.White
-                                )
-                            ) {
-                                Icon(
-                                    Icons.Default.Close,
-                                    contentDescription = "Fechar",
-                                    tint = Color.White
-                                )
-                            }
-                        }
-
+                        // Botão Fechar
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Fechar",
+                            tint = Color.White,
+                            modifier = Modifier.clickable { navController.popBackStack() }
+                        )
+                        // Vidas
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                Icons.Default.Favorite,
-                                contentDescription = "Vidas",
-                                tint = Color.Red
-                            )
-
+                            Icon(Icons.Default.Favorite, contentDescription = "Vidas", tint = Color.Red)
                             Spacer(modifier = Modifier.size(6.dp))
-
-                            Text(
-                                text = "5",
-                                color = Color.White,
-                                style = MaterialTheme.typography.titleMedium
-                            )
+                            Text("5", color = Color.White, style = MaterialTheme.typography.titleMedium)
                         }
                     }
                 }
 
-                // Enunciado
+                // --- Enunciado - Sem alterações ---
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -139,93 +127,110 @@ fun TelaExercicio(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                LazyColumn {
-                    items(opcoes){
-                        op ->
-                        Opcoes(op)
-                        Spacer(modifier = Modifier.height(5.dp))
+                // --- Lista de Opções com a nova lógica ---
+                LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
+                    items(opcoes) { op ->
+                        Opcoes(
+                            texto = op,
+                            isAnswered = isAnswered,
+                            isSelected = op == respostaSelecionada,
+                            isCorrect = op == respostaCorreta,
+                            onClick = {
+                                if (!isAnswered) { // Permite o clique apenas uma vez
+                                    respostaSelecionada = op
+                                }
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(10.dp))
                     }
                 }
 
-
                 Spacer(modifier = Modifier.weight(1f))
 
-                // Resposta + Próxima
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White
-                    )
-                ) {
-                    Row(
+
+                if (isAnswered) {
+                    val isCorrect = respostaSelecionada == respostaCorreta
+
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
 
-                        TextField(
-                            value = resp ,
-                            onValueChange = { novaResp ->
-                                resp = novaResp
-                            }
-                        )
-
                         Button(
-                            onClick = { },
+                            onClick = {
+                                navController.popBackStack()
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(24, 104, 238, 255),
-                                contentColor = Color.White
+                                containerColor = if (isCorrect) Color(46, 139, 87) else Color(178, 34, 34)
                             )
                         ) {
-                            Text(text = "Próxima")
+                            Text(text = "Continuar", style = MaterialTheme.typography.titleMedium)
                         }
                     }
                 }
             }
-
         }
     }
 }
 
-@Composable
-fun Opcoes(texto: String = "") {
+    @Composable
+    fun Opcoes(
+            texto: String,
+            isAnswered: Boolean,
+            isSelected: Boolean,
+            isCorrect: Boolean,
+            onClick: () -> Unit
+        ) {
 
-    Card(
-        modifier = Modifier
-            .width(200.dp)
-            .height(50.dp),
+            val containerColor = when {
+                !isAnswered -> Color(24, 104, 238, 255)
+                isSelected && isCorrect -> Color(46, 139, 87)
+                isSelected && !isCorrect -> Color(
+                    178,
+                    34,
+                    34
+                )
+                !isSelected && isCorrect -> Color(
+                    46,
+                    139,
+                    87
+                )
+                else -> Color.LightGray
+            }
 
-        colors = CardDefaults.cardColors(
-            containerColor = Color(24, 104, 238, 255),
-            contentColor = Color.White
-        )
-    ) {
+            Card(
+                modifier = Modifier
+                    .width(200.dp)
+                    .height(50.dp),
+                onClick = onClick,
+                enabled = !isAnswered,
+                colors = CardDefaults.cardColors(
+                    containerColor = containerColor,
+                    contentColor = Color.White,
+                    disabledContainerColor = containerColor.copy(alpha = 0.7f),
+                    disabledContentColor = Color.White
+                )
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
 
-        Row (
-            modifier = Modifier.fillMaxHeight().padding(10.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ){
-
-            Icon(
-                imageVector = Icons.Outlined.KeyboardArrowRight,
-                contentDescription = "Icon arrow"
-            )
-
-            Spacer(modifier = Modifier.width(5.dp))
-
-            Text(
-                text = texto,
-                style = MaterialTheme.typography.bodyLarge
-            )
+                    Text(
+                        text = texto,
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
+            }
         }
 
-    }
 
-
-
-}
 
 
 
