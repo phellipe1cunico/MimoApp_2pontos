@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.mimoapp.ui.theme.MimoAppTheme
 
 class Exercicio : ComponentActivity() {
@@ -38,16 +39,13 @@ class Exercicio : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            MimoAppTheme {
-                TelaExercicio()
-            }
+
         }
     }
 }
 
-@Preview
 @Composable
-fun TelaExercicio() {
+fun TelaExercicio(navController: NavController) {
     Scaffold { innerPadding ->
         Surface(
             color = Color(255, 250, 250),
@@ -66,13 +64,37 @@ fun TelaExercicio() {
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.Close, contentDescription = "Fechar", tint = Color.White)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Button(
+                                onClick = {
+                                    navController.popBackStack()
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(24, 104, 238, 255),
+                                    contentColor = Color.White
+                                )
+                            ) {
+                                Icon(
+                                    Icons.Default.Close,
+                                    contentDescription = "Fechar",
+                                    tint = Color.White
+                                )
+                            }
                         }
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.Favorite, contentDescription = "Vidas", tint = Color.Red)
+                            Icon(
+                                Icons.Default.Favorite,
+                                contentDescription = "Vidas",
+                                tint = Color.Red
+                            )
                             Spacer(modifier = Modifier.size(6.dp))
-                            Text(text = "Vidas", color = Color.White, style = MaterialTheme.typography.titleMedium)
+                            Text(
+                                text = "5",
+                                color = Color.White,
+                                style = MaterialTheme.typography.titleMedium
+                            )
                         }
                     }
                 }
@@ -127,5 +149,8 @@ fun TelaExercicio() {
         }
     }
 }
+
+
+
 
 

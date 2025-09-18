@@ -3,16 +3,13 @@ package com.example.mimoapp
 
 import android.content.Intent
 import android.os.Bundle
-import android.provider.CalendarContract
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -23,8 +20,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -38,12 +33,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.mimoapp.ui.theme.MimoAppTheme
+import androidx.navigation.NavController
 
 
 class TelaPrincipal : ComponentActivity() {
@@ -51,16 +44,14 @@ class TelaPrincipal : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            MimoAppTheme {
-                TelaInicial()
-            }
+
         }
     }
 }
 
-@Preview
+//@Preview
 @Composable
-fun TelaInicial(){
+fun TelaInicial(navController: NavController){
 
     Scaffold {
             innerPadding ->
@@ -87,9 +78,9 @@ fun TelaInicial(){
                 Spacer(modifier = Modifier.height(50.dp))
                 Titulo()
                 Spacer(modifier = Modifier.height(40.dp))
-                Exercicios()
+                Exercicios(navController = navController)
                 Spacer(modifier = Modifier.weight(1f))
-                Rodape()
+                Rodape(navController = navController)
             }
         }
     }
@@ -246,8 +237,8 @@ fun Titulo(){
 
 //@Preview
 @Composable
-fun Exercicios(){
-    val context = LocalContext.current  // ✅ pegar o contexto aqui, dentro da @Composable
+fun Exercicios(navController: NavController){
+    val context = LocalContext.current
 
     Card(
         colors = CardDefaults.cardColors(containerColor = Color(15,82,186))
@@ -270,7 +261,7 @@ fun Exercicios(){
 
             Button(
                 onClick = {
-                    context.startActivity(Intent(context, Exercicio::class.java)) // ✅ usar o context já obtido
+                    navController.navigate("exercicio")
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(15,82,186),
@@ -294,7 +285,7 @@ fun Exercicios(){
 
 //Preview
 @Composable
-fun Rodape(){
+fun Rodape(navController: NavController){
 
     Surface(
         color = Color(15,82,186)
@@ -304,13 +295,13 @@ fun Rodape(){
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
             horizontalArrangement = Arrangement.Center
         ) {
-            BotaoChapeu()
+            BotaoChapeu(navController = navController)
             Spacer(modifier = Modifier.weight(1f))
-            BotaoNotas()
+            BotaoNotas(navController = navController)
             Spacer(modifier = Modifier.weight(1f))
-            BotaoMedalha()
+            BotaoMedalha(navController = navController)
             Spacer(modifier = Modifier.weight(1f))
-            BotaoPerfil()
+            BotaoPerfil(navController = navController)
         }
 
     }
@@ -318,11 +309,13 @@ fun Rodape(){
 
 //@Preview
 @Composable
-fun BotaoChapeu(){
+fun BotaoChapeu(navController: NavController){
 
         Button(
             onClick = {
+                navController.navigate("principal"){
 
+                }
             },
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(15,82,186),
@@ -343,10 +336,10 @@ fun BotaoChapeu(){
 
 //@Preview
 @Composable
-fun BotaoMedalha(){
+fun BotaoMedalha(navController: NavController) {
     Button(
         onClick = {
-
+            navController.navigate("leaderboard"){}
         },
         colors = ButtonDefaults.buttonColors(
             containerColor = Color(15,82,186),
@@ -364,11 +357,11 @@ fun BotaoMedalha(){
 
 //@Preview
 @Composable
-fun BotaoPerfil() {
-    val context = LocalContext.current
+fun BotaoPerfil(navController: NavController) {
+
     Button(
         onClick = {
-            context.startActivity(Intent(context, PerfilActivity::class.java))
+            navController.navigate("perfil"){}
         },
         colors = ButtonDefaults.buttonColors(
             containerColor = Color(15,82,186),
@@ -386,10 +379,12 @@ fun BotaoPerfil() {
 
 //@Preview
 @Composable
-fun BotaoNotas(){
+fun BotaoNotas(navController: NavController){
     Button(
         onClick = {
+            navController.navigate("anotacoes"){
 
+            }
         },
         colors = ButtonDefaults.buttonColors(
             containerColor = Color(15,82,186),

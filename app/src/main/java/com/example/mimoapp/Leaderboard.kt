@@ -1,23 +1,25 @@
 package com.example.mimoapp
 
 import android.os.Bundle
-import android.provider.CalendarContract
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.border
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -29,11 +31,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.mimoapp.ui.theme.MimoAppTheme
 
 class Leaderboard : ComponentActivity() {
@@ -41,17 +46,13 @@ class Leaderboard : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            MimoAppTheme {
-                TelaLeaderboard()
 
-            }
         }
     }
 }
 
-@Preview
 @Composable
-fun TelaLeaderboard() {
+fun TelaLeaderboard(navController: NavController) {
     Scaffold { innerPadding ->
 
         Surface(
@@ -69,69 +70,75 @@ fun TelaLeaderboard() {
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.padding(15.dp)
                     ) {
+                        CabecalhoLiga()
                         Spacer(modifier = Modifier.height(10.dp))
                     }
                 }
+
+                Spacer(modifier = Modifier.height(30.dp))
+                Lideres()
+
                 Spacer(modifier = Modifier.weight(1f))
-                Rodape()
+                Rodape(navController = navController)
             }
         }
     }
 }
 
-@Preview
+//@Preview
 @Composable
-fun CabecalhoLiga(){
-
-
-    Card(
-
-    ) {
+fun CabecalhoLiga() {
+    Card {
         Column {
-
             Surface(
-                modifier = Modifier.fillMaxWidth().height(50.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
                 color = Color(24, 104, 238, 255)
-
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth().height(50.dp).padding(horizontal = 15.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 15.dp),
                     horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-
                     Text(
                         "Leaderboard",
                         style = MaterialTheme.typography.headlineMedium,
                         color = Color.White
                     )
-
                 }
             }
 
             Surface(
-                modifier = Modifier.fillMaxWidth().height(5.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(5.dp),
                 color = Color.Black
             ) {}
 
             Surface(
-                modifier = Modifier.fillMaxWidth().height(150.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(150.dp),
                 color = Color(24, 104, 238, 255)
-
             ) {
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(horizontal = 15.dp)
+                Column(
+                    modifier = Modifier.fillMaxSize().padding(10.dp),
+                    verticalArrangement = Arrangement.Center
                 ) {
-
-                    Column {
-
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(horizontal = 15.dp)
+                    ) {
                         Card(
-                            modifier = Modifier.width(80.dp).padding(5.dp),
+                            modifier = Modifier
+                                .width(80.dp)
+                                .padding(5.dp),
                             shape = ShapeDefaults.ExtraLarge,
                         ) {
-                            Column (
+                            Column(
                                 modifier = Modifier.fillMaxWidth(),
                                 verticalArrangement = Arrangement.Center,
                                 horizontalAlignment = Alignment.CenterHorizontally
@@ -140,67 +147,106 @@ fun CabecalhoLiga(){
                                     painter = painterResource(id = R.drawable.codigo),
                                     contentDescription = "Code",
                                     modifier = Modifier.size(50.dp),
-                                    tint = Color(113,54,0)
+                                    tint = Color(113, 54, 0)
                                 )
-
                             }
-
                         }
 
-                        Text(
-                            "Liga de Madeira",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = Color.White
-                        )
-                    }
+                        Spacer(modifier = Modifier.weight(1f))
 
-
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    Card(
-                        modifier = Modifier.width(80.dp).padding(5.dp),
-                        shape = ShapeDefaults.ExtraLarge,
-                    ) {
-                        Column (
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
+                        Card(
+                            modifier = Modifier
+                                .width(80.dp)
+                                .padding(5.dp),
+                            shape = ShapeDefaults.ExtraLarge,
                         ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_lock),
-                                contentDescription = "Code",
-                                modifier = Modifier.size(50.dp),
-                                tint = Color(74,74,74)
-                            )
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_lock),
+                                    contentDescription = "Lock",
+                                    modifier = Modifier.size(50.dp),
+                                    tint = Color(74, 74, 74)
+                                )
+                            }
                         }
-                    }
 
-                    Spacer(modifier = Modifier.weight(1f))
+                        Spacer(modifier = Modifier.weight(1f))
 
-                    Card(
-                        modifier = Modifier.width(80.dp).padding(5.dp),
-                        shape = ShapeDefaults.ExtraLarge,
-                    ) {
-                        Column (
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
+                        Card(
+                            modifier = Modifier
+                                .width(80.dp)
+                                .padding(5.dp),
+                            shape = ShapeDefaults.ExtraLarge,
                         ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_lock),
-                                contentDescription = "Code",
-                                modifier = Modifier.size(50.dp),
-                                tint = Color(211,175,55)
-                            )
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_lock),
+                                    contentDescription = "Lock",
+                                    modifier = Modifier.size(50.dp),
+                                    tint = Color(211, 175, 55)
+                                )
+                            }
                         }
                     }
 
+                    Spacer(modifier = Modifier.height(12.dp))
 
-
+                    Text(
+                        text = "Liga de Bronze",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = Color.White
+                    )
                 }
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+fun Lideres() {
+    Card(
+        modifier = Modifier.fillMaxWidth().padding(10.dp).height(100.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(24, 104, 238, 255)
+        )
+    ) {
+        Row(
+            modifier = Modifier.fillMaxHeight().padding(horizontal = 15.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(CircleShape)
+                    .background(Color(220, 230, 255))
+            ) {
+
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = "Icone pessoa",
+                    modifier = Modifier.size(50.dp),
+                    tint = Color(24, 104, 238, 255)
+                )
 
             }
 
+            Spacer(modifier = Modifier.width(20.dp))
+
+            Text(
+                "1. Robertinho",
+                style = MaterialTheme.typography.headlineMedium,
+                color = Color.White
+            )
         }
     }
 }
