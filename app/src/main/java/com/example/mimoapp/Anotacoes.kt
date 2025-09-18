@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -16,8 +17,10 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -44,6 +47,7 @@ class Anotacoes : ComponentActivity() {
         }
     }
 }
+
 @Composable
 fun TelaAnotacoes(navController: NavController) {
     Scaffold { innerPadding ->
@@ -67,7 +71,7 @@ fun TelaAnotacoes(navController: NavController) {
                             horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier.padding(15.dp)
                         ) {
-                            Cabecalho1()
+                            CabecalhoNotas()
                             Spacer(modifier = Modifier.height(10.dp))
 
                         }
@@ -119,6 +123,44 @@ fun FormNotas(){
                 imageVector = Icons.Default.Add,
                 contentDescription = "Icone Add",
             )
+
+        }
+    }
+}
+
+//@Preview
+@Composable
+fun CabecalhoNotas(){
+    Surface(
+        color = Color(24, 104, 238, 255),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(120.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(18.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            Column {
+
+                Text(
+                    text = "Anotações",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = Color.White
+                )
+
+                Spacer(modifier = Modifier.height(15.dp))
+
+                Text(
+                    text = "Registre aqui suas anotações sobre o conteúdo 😎",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Color.White
+                )
+
+            }
 
         }
     }
