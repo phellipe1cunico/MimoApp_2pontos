@@ -25,7 +25,6 @@ class MainActivity : ComponentActivity() {
                     composable("perfil") {TelaPerfil(navController)}
                     composable("exercicio") {TelaExercicio(navController)}
                 }
-
             }
         }
     }

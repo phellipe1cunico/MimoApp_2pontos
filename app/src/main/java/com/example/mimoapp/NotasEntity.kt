@@ -5,13 +5,11 @@ import androidx.room.PrimaryKey
 
 
 @Entity(tableName = "notas")
-data class Notas(
 
+data class NotasEntity(
 
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-
-
     val titulo: String,
     val descricao: String,
     )

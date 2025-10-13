@@ -12,6 +12,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MimoApp">
         <activity
+            android:name=".TelaNotas"
+            android:exported="false"
+            android:label="@string/title_activity_tela_notas"
+            android:theme="@style/Theme.MimoApp" />
+        <activity
             android:name=".Perfil"
             android:exported="false"
             android:label="@string/title_activity_perfil"

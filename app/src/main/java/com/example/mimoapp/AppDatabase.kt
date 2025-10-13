@@ -5,13 +5,12 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [Notas::class], version = 1)
+@Database(entities = [NotasEntity::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun notasDAO(): NotasDAO
 
     companion object {
-
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
