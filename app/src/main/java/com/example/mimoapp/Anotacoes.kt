@@ -1,9 +1,11 @@
 package com.example.mimoapp
 
+import android.R.attr.onClick
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,12 +18,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -34,6 +41,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,6 +54,9 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.mimoapp.ui.theme.MimoAppTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class Anotacoes : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -136,8 +147,12 @@ fun FormularioNotas() {
 
     var titulo by remember { mutableStateOf("") }
     var descricao by remember { mutableStateOf("") }
-    var notas by remember { mutableStateOf<List<NotasEntity>>(emptyList())}
+    var notas by remember { mutableStateOf<List<NotasEntity>>(emptyList()) }
+    var notaSelecionada by remember { mutableStateOf<NotasEntity?>(null) }
 
+    val textoBotao = if (notaSelecionada == null) "Adicionar nota" else "Atualizar nota"
+
+    val scope = rememberCoroutineScope()
     val contex = LocalContext.current
     val db = AppDatabase.getDatabase(contex)
     val notasDao = db.notasDAO()
@@ -146,7 +161,19 @@ fun FormularioNotas() {
         notas = buscarNotas(notasDao)
     }
 
+    LaunchedEffect(notaSelecionada) {
+        if (notaSelecionada != null) {
+            titulo = notaSelecionada!!.titulo
+            descricao = notaSelecionada!!.descricao
+        }
+    }
+
+
+
     Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp)
     ) {
         TextField(
             value = titulo,
@@ -158,7 +185,7 @@ fun FormularioNotas() {
                 )
             },
             placeholder = { Text("Título da Nota") },
-            modifier = Modifier.fillMaxWidth().padding(15.dp),
+            modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             colors = TextFieldDefaults.colors(
                 focusedTextColor = Color.White,
@@ -176,7 +203,7 @@ fun FormularioNotas() {
 
         TextField(
             value = descricao,
-            onValueChange = { descricao = it},
+            onValueChange = { descricao = it },
             label = {
                 Text(
                     "Descrição",
@@ -188,8 +215,7 @@ fun FormularioNotas() {
 
             modifier = Modifier
                 .fillMaxWidth()
-                .height(120.dp)
-                .padding(15.dp),
+                .height(120.dp),
 
             colors = TextFieldDefaults.colors(
                 focusedTextColor = Color.White,
@@ -208,11 +234,27 @@ fun FormularioNotas() {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center
-        ){
+        ) {
             Button(
                 onClick = {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        if (titulo.isNotBlank() && descricao.isNotBlank()) {
 
+                            if (notaSelecionada == null) {
+                                save(titulo, descricao, notasDao)
+                            } else {
 
+                                val notaAtualizada = notaSelecionada!!.copy(titulo = titulo, descricao = descricao)
+                                update(notaAtualizada, notasDao)
+                            }
+
+                            notas = buscarNotas(notasDao)
+                            titulo = ""
+                            descricao = ""
+                            notaSelecionada = null
+
+                        }
+                    }
                 },
                 contentPadding = PaddingValues(10.dp),
                 shape = CircleShape,
@@ -221,19 +263,98 @@ fun FormularioNotas() {
                     contentColor = Color.White
                 )
             ) {
-                Text(
-                    "Adicionar nota"
+                Text(textoBotao)
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        LazyColumn(
+            modifier = Modifier.weight(1f)
+        ) {
+            items(notas) { nota ->
+                NotaCard(
+                    nota = nota,
+                    onClick = {
+                        notaSelecionada = nota
+                    },
+
+                    onDeleteClick = {
+                        scope.launch {
+                            deletar(nota, notasDao)
+                            notas = buscarNotas(notasDao)
+                        }
+                    }
                 )
             }
         }
     }
-
 }
 
 @Composable
-fun BotaoNota(){
+fun NotaCard(
+    nota: NotasEntity,
+    onClick: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+            .clickable { onClick() },
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        )
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ){
+
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                    Text(
+                        text = nota.titulo,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Color.Black
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = nota.descricao,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.DarkGray
+                    )
+
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            Button(
+                onClick = onDeleteClick,
+
+                modifier = Modifier.padding(15.dp),
+                shape = CircleShape,
 
 
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(15,82,186),
+                    contentColor = Color.White
+                )
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Deletar"
+                )
+
+            }
+
+        }
+    }
 }
+
 
 

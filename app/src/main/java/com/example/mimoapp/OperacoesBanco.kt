@@ -11,7 +11,7 @@ suspend fun buscarNotas(notasDao: NotasDAO): List<NotasEntity> {
     }
 }
 
-suspend fun add(titulo: String, descricao: String, notasDao: NotasDAO) {
+suspend fun save(titulo: String, descricao: String, notasDao: NotasDAO) {
     try {
         notasDao.save(NotasEntity(titulo = titulo, descricao = descricao))
     } catch (e: Exception) {
@@ -21,7 +21,7 @@ suspend fun add(titulo: String, descricao: String, notasDao: NotasDAO) {
 
 suspend fun deletar(notas: NotasEntity, notasDao: NotasDAO) {
     try {
-        notasDao.delete(notas)
+        notasDao.deletar(notas)
     } catch (e: Exception) {
         Log.e("Erro ao deletar", "Msg: ${e.message}")
     }

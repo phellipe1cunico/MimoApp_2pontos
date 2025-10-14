@@ -17,7 +17,7 @@ interface NotasDAO{
     suspend fun buscarNotas() : List<NotasEntity>
                                 //data class
     @Delete
-    suspend fun delete(notas: NotasEntity)
+    suspend fun deletar(notas: NotasEntity)
 
     @Update
     suspend fun update(notas: NotasEntity)
