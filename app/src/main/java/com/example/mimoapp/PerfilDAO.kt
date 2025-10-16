@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PerfilDAO {
@@ -19,7 +20,7 @@ interface PerfilDAO {
     suspend fun buscarPerfilAtual(): PerfilEntity?
     
     @Query("SELECT * FROM perfil")
-    suspend fun buscarTodosPerfis(): List<PerfilEntity>
+    suspend fun buscarTodosPerfis(): Flow<List<PerfilEntity>>
     
     @Update
     suspend fun update(perfil: PerfilEntity)
