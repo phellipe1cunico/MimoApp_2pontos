@@ -51,7 +51,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.mimoapp.data.local.AppDatabase
+import com.example.mimoapp.data.local.PerfilEntity
 import kotlinx.coroutines.launch
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.mimoapp.data.repository.PerfilRepository
+import com.example.mimoapp.ui.perfil.PerfilViewModel
 
 class PerfilActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,36 +72,34 @@ class PerfilActivity : ComponentActivity() {
 
 @Composable
 fun TelaPerfil(navController: NavController) {
-    var perfil by remember { mutableStateOf<PerfilEntity?>(null) }
-    var isEditing by remember { mutableStateOf(false) }
-    var showDeleteDialog by remember { mutableStateOf(false) }
-    var showCreateDialog by remember { mutableStateOf(false) }
-    
-    // Form states
-    var nome by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var nivel by remember { mutableStateOf("Iniciante") }
-    var pontos by remember { mutableStateOf("0") }
-    var certificados by remember { mutableStateOf("0") }
-    var amigos by remember { mutableStateOf("0") }
-    
-    val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    val db = AppDatabase.getDatabase(context)
-    val perfilDao = db.perfilDAO()
+    val db = AppDatabase.getDatabase(context.applicationContext)
+    val repository = PerfilRepository(db.perfilDAO())
 
-    // Load profile on startup
-    LaunchedEffect(Unit) {
-        perfil = buscarPerfilAtual(perfilDao) ?: criarPerfilPadrao(perfilDao)
-        perfil?.let {
-            nome = it.nome
-            email = it.email
-            nivel = it.nivel
-            pontos = it.pontos.toString()
-            certificados = it.certificados.toString()
-            amigos = it.amigos.toString()
+    val viewModel: PerfilViewModel = viewModel(
+        factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                if (modelClass.isAssignableFrom(PerfilViewModel::class.java)) {
+                    @Suppress("UNCHECKED_CAST")
+                    return PerfilViewModel(repository) as T
+                }
+                throw IllegalArgumentException("Unknown ViewModel class")
+            }
         }
-    }
+    )
+
+    val perfil by viewModel.perfil.collectAsStateWithLifecycle()
+    val isEditing by viewModel.isEditing.collectAsStateWithLifecycle()
+    val showDeleteDialog by viewModel.showDeleteDialog.collectAsStateWithLifecycle()
+    val showCreateDialog by viewModel.showCreateDialog.collectAsStateWithLifecycle()
+
+    // Coletar estado dos formulários
+    val nome by viewModel.nome.collectAsStateWithLifecycle()
+    val email by viewModel.email.collectAsStateWithLifecycle()
+    val nivel by viewModel.nivel.collectAsStateWithLifecycle()
+    val pontos by viewModel.pontos.collectAsStateWithLifecycle()
+    val certificados by viewModel.certificados.collectAsStateWithLifecycle()
+    val amigos by viewModel.amigos.collectAsStateWithLifecycle()
 
     Scaffold { innerPadding ->
         Surface(
@@ -125,11 +130,11 @@ fun TelaPerfil(navController: NavController) {
                             style = MaterialTheme.typography.titleLarge,
                             color = Color.White
                         )
-                        
+
                         Row {
                             if (perfil != null) {
                                 Button(
-                                    onClick = { isEditing = !isEditing },
+                                    onClick = { viewModel.onEditToggle() },
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = Color.Transparent,
                                         contentColor = Color.White
@@ -142,7 +147,7 @@ fun TelaPerfil(navController: NavController) {
                                 }
                             } else {
                                 Button(
-                                    onClick = { showCreateDialog = true },
+                                    onClick = { viewModel.onShowCreateDialog(true) },
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = Color.Transparent,
                                         contentColor = Color.White
@@ -175,9 +180,9 @@ fun TelaPerfil(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Profile Information
+
                 if (isEditing) {
-                    // Edit Mode
+
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -186,7 +191,7 @@ fun TelaPerfil(navController: NavController) {
                     ) {
                         TextField(
                             value = nome,
-                            onValueChange = { nome = it },
+                            onValueChange = { viewModel.onNomeChange(it) },
                             label = { Text("Nome") },
                             modifier = Modifier.fillMaxWidth(),
                             colors = TextFieldDefaults.colors(
@@ -194,12 +199,12 @@ fun TelaPerfil(navController: NavController) {
                                 unfocusedContainerColor = Color.White
                             )
                         )
-                        
+
                         Spacer(modifier = Modifier.height(8.dp))
-                        
+
                         TextField(
                             value = email,
-                            onValueChange = { email = it },
+                            onValueChange = { viewModel.onEmailChange(it) },
                             label = { Text("Email") },
                             modifier = Modifier.fillMaxWidth(),
                             colors = TextFieldDefaults.colors(
@@ -207,12 +212,12 @@ fun TelaPerfil(navController: NavController) {
                                 unfocusedContainerColor = Color.White
                             )
                         )
-                        
+
                         Spacer(modifier = Modifier.height(8.dp))
-                        
+
                         TextField(
                             value = nivel,
-                            onValueChange = { nivel = it },
+                            onValueChange = { viewModel.onNivelChange(it) },
                             label = { Text("Nível") },
                             modifier = Modifier.fillMaxWidth(),
                             colors = TextFieldDefaults.colors(
@@ -220,12 +225,12 @@ fun TelaPerfil(navController: NavController) {
                                 unfocusedContainerColor = Color.White
                             )
                         )
-                        
+
                         Spacer(modifier = Modifier.height(8.dp))
-                        
+
                         TextField(
                             value = pontos,
-                            onValueChange = { pontos = it },
+                            onValueChange = { viewModel.onPontosChange(it) },
                             label = { Text("Pontos") },
                             modifier = Modifier.fillMaxWidth(),
                             colors = TextFieldDefaults.colors(
@@ -233,12 +238,12 @@ fun TelaPerfil(navController: NavController) {
                                 unfocusedContainerColor = Color.White
                             )
                         )
-                        
+
                         Spacer(modifier = Modifier.height(8.dp))
-                        
+
                         TextField(
                             value = certificados,
-                            onValueChange = { certificados = it },
+                            onValueChange = { viewModel.onCertificadosChange(it) },
                             label = { Text("Certificados") },
                             modifier = Modifier.fillMaxWidth(),
                             colors = TextFieldDefaults.colors(
@@ -246,12 +251,12 @@ fun TelaPerfil(navController: NavController) {
                                 unfocusedContainerColor = Color.White
                             )
                         )
-                        
+
                         Spacer(modifier = Modifier.height(8.dp))
-                        
+
                         TextField(
                             value = amigos,
-                            onValueChange = { amigos = it },
+                            onValueChange = { viewModel.onAmigosChange(it) },
                             label = { Text("Amigos") },
                             modifier = Modifier.fillMaxWidth(),
                             colors = TextFieldDefaults.colors(
@@ -259,41 +264,24 @@ fun TelaPerfil(navController: NavController) {
                                 unfocusedContainerColor = Color.White
                             )
                         )
-                        
+
                         Spacer(modifier = Modifier.height(16.dp))
-                        
+
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
                             Button(
-                                onClick = {
-                                    scope.launch {
-                                        perfil?.let { currentPerfil ->
-                                            val updatedPerfil = currentPerfil.copy(
-                                                nome = nome,
-                                                email = email,
-                                                nivel = nivel,
-                                                pontos = pontos.toIntOrNull() ?: 0,
-                                                certificados = certificados.toIntOrNull() ?: 0,
-                                                amigos = amigos.toIntOrNull() ?: 0
-                                            )
-                                            if (atualizarPerfil(updatedPerfil, perfilDao)) {
-                                                perfil = updatedPerfil
-                                                isEditing = false
-                                            }
-                                        }
-                                    }
-                                },
+                                onClick = { viewModel.salvarEdicoes() },
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color(46, 139, 87)
                                 )
                             ) {
                                 Text("Salvar")
                             }
-                            
+
                             Button(
-                                onClick = { showDeleteDialog = true },
+                                onClick = { viewModel.onShowDeleteDialog(true) },
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color(178, 34, 34)
                                 )
@@ -313,17 +301,17 @@ fun TelaPerfil(navController: NavController) {
                             color = Color(60, 60, 60),
                             fontWeight = FontWeight.Bold
                         )
-                        
+
                         Spacer(modifier = Modifier.height(8.dp))
-                        
+
                         Text(
                             text = perfil?.email ?: "",
                             style = MaterialTheme.typography.bodyLarge,
                             color = Color(100, 100, 100)
                         )
-                        
+
                         Spacer(modifier = Modifier.height(8.dp))
-                        
+
                         Text(
                             text = "Nível: ${perfil?.nivel ?: "N/A"}",
                             style = MaterialTheme.typography.bodyMedium,
@@ -349,14 +337,14 @@ fun TelaPerfil(navController: NavController) {
                             icon = Icons.Default.Star,
                             color = Color(255, 193, 7)
                         )
-                        
+
                         StatCard(
                             title = "Certificados",
                             value = perfil!!.certificados.toString(),
                             icon = Icons.Default.Home,
                             color = Color(76, 175, 80)
                         )
-                        
+
                         StatCard(
                             title = "Amigos",
                             value = perfil!!.amigos.toString(),
@@ -375,42 +363,32 @@ fun TelaPerfil(navController: NavController) {
     // Create Profile Dialog
     if (showCreateDialog) {
         AlertDialog(
-            onDismissRequest = { showCreateDialog = false },
+            onDismissRequest = { viewModel.onShowCreateDialog(false) },
             title = { Text("Criar Perfil") },
             text = {
                 Column {
                     TextField(
                         value = nome,
-                        onValueChange = { nome = it },
+                        onValueChange = { viewModel.onNomeChange(it) },
                         label = { Text("Nome") },
                         modifier = Modifier.fillMaxWidth()
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     TextField(
                         value = email,
-                        onValueChange = { email = it },
+                        onValueChange = { viewModel.onEmailChange(it) },
                         label = { Text("Email") },
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
             },
             confirmButton = {
-                Button(
-                    onClick = {
-                        scope.launch {
-                            val novoPerfil = salvarPerfil(nome, email, perfilDao)
-                            if (novoPerfil != null) {
-                                perfil = novoPerfil
-                                showCreateDialog = false
-                            }
-                        }
-                    }
-                ) {
+                Button(onClick = { viewModel.criarNovoPerfil() }) {
                     Text("Criar")
                 }
             },
             dismissButton = {
-                Button(onClick = { showCreateDialog = false }) {
+                Button(onClick = { viewModel.onShowCreateDialog(false) }) {
                     Text("Cancelar")
                 }
             }
@@ -420,22 +398,12 @@ fun TelaPerfil(navController: NavController) {
     // Delete Confirmation Dialog
     if (showDeleteDialog) {
         AlertDialog(
-            onDismissRequest = { showDeleteDialog = false },
+            onDismissRequest = { viewModel.onShowDeleteDialog(false) },
             title = { Text("Deletar Perfil") },
             text = { Text("Tem certeza que deseja deletar seu perfil? Esta ação não pode ser desfeita.") },
             confirmButton = {
                 Button(
-                    onClick = {
-                        scope.launch {
-                            perfil?.let {
-                                if (deletarPerfil(it, perfilDao)) {
-                                    perfil = null
-                                    isEditing = false
-                                    showDeleteDialog = false
-                                }
-                            }
-                        }
-                    },
+                    onClick = { viewModel.deletarPerfil() },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(178, 34, 34)
                     )
@@ -444,7 +412,7 @@ fun TelaPerfil(navController: NavController) {
                 }
             },
             dismissButton = {
-                Button(onClick = { showDeleteDialog = false }) {
+                Button(onClick = { viewModel.onShowDeleteDialog(false) }) {
                     Text("Cancelar")
                 }
             }

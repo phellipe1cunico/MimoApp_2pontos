@@ -1,4 +1,4 @@
-package com.example.mimoapp
+package com.example.mimoapp.data.local
 
 import androidx.room.Dao
 import androidx.room.Delete
