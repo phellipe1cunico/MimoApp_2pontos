@@ -20,7 +20,7 @@ interface PerfilDAO {
     suspend fun buscarPerfilAtual(): PerfilEntity?
     
     @Query("SELECT * FROM perfil")
-    suspend fun buscarTodosPerfis(): Flow<List<PerfilEntity>>
+    fun buscarTodosPerfis(): Flow<List<PerfilEntity>>
     
     @Update
     suspend fun update(perfil: PerfilEntity)

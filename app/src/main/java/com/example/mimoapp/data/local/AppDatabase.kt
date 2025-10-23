@@ -1,9 +1,11 @@
-package com.example.mimoapp
+package com.example.mimoapp.data.local
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.example.mimoapp.PerfilDAO
+import com.example.mimoapp.PerfilEntity
 
 @Database(entities = [NotasEntity::class, PerfilEntity::class], version = 2)
 abstract class AppDatabase : RoomDatabase() {

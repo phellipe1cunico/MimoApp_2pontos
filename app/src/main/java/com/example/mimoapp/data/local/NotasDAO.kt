@@ -1,4 +1,4 @@
-package com.example.mimoapp
+package com.example.mimoapp.data.local
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -15,7 +15,7 @@ interface NotasDAO{
     //nome da tabela: data class
 
     @Query("SELECT * FROM notas")
-    suspend fun buscarNotas() : Flow<List<NotasEntity>>
+    fun buscarNotas() : Flow<List<NotasEntity>>
                                 //data class
     @Delete
     suspend fun deletar(notas: NotasEntity)

@@ -1,6 +1,7 @@
 package com.example.mimoapp
 
 import android.util.Log
+import kotlinx.coroutines.flow.Flow
 
 // CREATE - Salvar novo perfil
 suspend fun salvarPerfil(nome: String, email: String, perfilDao: PerfilDAO): PerfilEntity? {
@@ -34,14 +35,11 @@ suspend fun buscarPerfilPorId(id: Int, perfilDao: PerfilDAO): PerfilEntity? {
     }
 }
 
-// READ - Buscar todos os perfis
-suspend fun buscarTodosPerfis(perfilDao: PerfilDAO): List<PerfilEntity> {
-    return try {
-        perfilDao.buscarTodosPerfis()
-    } catch (e: Exception) {
-        Log.e("Erro ao buscar todos os perfis", "Msg: ${e.message}")
-        emptyList()
-    }
+
+fun buscarTodosPerfis(perfilDao: PerfilDAO): Flow<List<PerfilEntity>> {
+    // 3. Apenas retorne o Flow do DAO.
+    // O ViewModel tratará exceções com o operador .catch
+    return perfilDao.buscarTodosPerfis()
 }
 
 // UPDATE - Atualizar perfil completo

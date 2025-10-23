@@ -1,13 +1,11 @@
 package com.example.mimoapp
 
-import android.R.attr.onClick
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -16,14 +14,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -46,17 +40,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
-import com.example.mimoapp.ui.theme.MimoAppTheme
+import com.example.mimoapp.data.local.AppDatabase
+import com.example.mimoapp.data.local.NotasEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.mimoapp.data.repository.NotasRepository
+import com.example.mimoapp.ui.notas.NotasViewModel
 
 class Anotacoes : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,10 +70,32 @@ class Anotacoes : ComponentActivity() {
 @Composable
 fun TelaAnotacoes(navController: NavController) {
 
+    val context = LocalContext.current
+    val db = AppDatabase.getDatabase(context.applicationContext)
+    val repository = NotasRepository(db.notasDAO())
+
+    val viewModel: NotasViewModel = viewModel(
+        factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                if (modelClass.isAssignableFrom(NotasViewModel::class.java)) {
+                    @Suppress("UNCHECKED_CAST")
+                    return NotasViewModel(repository) as T
+                }
+                throw IllegalArgumentException("Unknown ViewModel class")
+            }
+        }
+    )
+
+    val titulo by viewModel.titulo.collectAsStateWithLifecycle()
+    val descricao by viewModel.descricao.collectAsStateWithLifecycle()
+    val notas by viewModel.notas.collectAsStateWithLifecycle()
+    val textoBotao by viewModel.textoBotao.collectAsStateWithLifecycle()
+
+
     Scaffold { innerPadding ->
 
                 Surface(
-                    color = Color(255, 250, 250),
+                    color = Color(24, 104, 238, 255),
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding)
@@ -83,7 +104,7 @@ fun TelaAnotacoes(navController: NavController) {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Surface(
-                            color = Color(15, 82, 186)
+                            color = Color(255, 255, 255, 255)
                         ) {
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -91,14 +112,26 @@ fun TelaAnotacoes(navController: NavController) {
                             ) {
                                 CabecalhoNotas()
 
+                                Spacer(modifier = Modifier.height(12.dp))
+
+                                FormularioNotas(
+                                    titulo = titulo,
+                                    onTituloChange = { viewModel.onTituloChange(it) },
+                                    descricao = descricao,
+                                    onDescricaoChange = { viewModel.onDescricaoChange(it) },
+                                    textoBotao = textoBotao,
+                                    onSalvarClick = { viewModel.salvarOuAtualizarNota() },
+                                    notas = notas,
+                                    onNotaClick = { viewModel.selecionarNota(it) },
+                                    onDeleteClick = { viewModel.deletarNota(it) }
+                                )
+
+                                Spacer(modifier = Modifier.weight(1f))
+                                Rodape(navController = navController)
+
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(12.dp))
-                        FormularioNotas()
-
-                        Spacer(modifier = Modifier.weight(1f))
-                        Rodape(navController = navController)
                     }
                 }
             }
@@ -143,32 +176,17 @@ fun CabecalhoNotas(){
 }
 
 @Composable
-fun FormularioNotas() {
-
-    var titulo by remember { mutableStateOf("") }
-    var descricao by remember { mutableStateOf("") }
-    var notas by remember { mutableStateOf<List<NotasEntity>>(emptyList()) }
-    var notaSelecionada by remember { mutableStateOf<NotasEntity?>(null) }
-
-    val textoBotao = if (notaSelecionada == null) "Adicionar nota" else "Atualizar nota"
-
-    val scope = rememberCoroutineScope()
-    val contex = LocalContext.current
-    val db = AppDatabase.getDatabase(contex)
-    val notasDao = db.notasDAO()
-
-    LaunchedEffect(Unit) {
-        notas = buscarNotas(notasDao)
-    }
-
-    LaunchedEffect(notaSelecionada) {
-        if (notaSelecionada != null) {
-            titulo = notaSelecionada!!.titulo
-            descricao = notaSelecionada!!.descricao
-        }
-    }
-
-
+fun FormularioNotas(
+    titulo: String,
+    onTituloChange: (String) -> Unit,
+    descricao: String,
+    onDescricaoChange: (String) -> Unit,
+    textoBotao: String,
+    onSalvarClick: () -> Unit,
+    notas: List<NotasEntity>,
+    onNotaClick: (NotasEntity) -> Unit,
+    onDeleteClick: (NotasEntity) -> Unit
+) {
 
     Column(
         modifier = Modifier
@@ -177,7 +195,7 @@ fun FormularioNotas() {
     ) {
         TextField(
             value = titulo,
-            onValueChange = { titulo = it },
+            onValueChange = onTituloChange,
             label = {
                 Text(
                     "Título",
@@ -203,7 +221,7 @@ fun FormularioNotas() {
 
         TextField(
             value = descricao,
-            onValueChange = { descricao = it },
+            onValueChange = onDescricaoChange,
             label = {
                 Text(
                     "Descrição",
@@ -236,26 +254,7 @@ fun FormularioNotas() {
             horizontalArrangement = Arrangement.Center
         ) {
             Button(
-                onClick = {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        if (titulo.isNotBlank() && descricao.isNotBlank()) {
-
-                            if (notaSelecionada == null) {
-                                save(titulo, descricao, notasDao)
-                            } else {
-
-                                val notaAtualizada = notaSelecionada!!.copy(titulo = titulo, descricao = descricao)
-                                update(notaAtualizada, notasDao)
-                            }
-
-                            notas = buscarNotas(notasDao)
-                            titulo = ""
-                            descricao = ""
-                            notaSelecionada = null
-
-                        }
-                    }
-                },
+                onClick = onSalvarClick,
                 contentPadding = PaddingValues(10.dp),
                 shape = CircleShape,
                 colors = ButtonDefaults.buttonColors(
@@ -275,16 +274,8 @@ fun FormularioNotas() {
             items(notas) { nota ->
                 NotaCard(
                     nota = nota,
-                    onClick = {
-                        notaSelecionada = nota
-                    },
-
-                    onDeleteClick = {
-                        scope.launch {
-                            deletar(nota, notasDao)
-                            notas = buscarNotas(notasDao)
-                        }
-                    }
+                    onClick = { onNotaClick(nota) },
+                    onDeleteClick = { onDeleteClick(nota) }
                 )
             }
         }
